@@ -10,13 +10,17 @@ export const register = asyncHandler(async (req: any, res) => {
 
   let avatarUrl;
   if (req.file) {
-    const result = await cloudinary.uploader.upload_stream(
-      { folder: "ecommerce/avatars" },
-      (error: any, result: any) => {
-        if (error) throw new Error("Cloudinary upload failed");
-        avatarUrl = result.secure_url;
-      }
-    ).end(req.file.buffer);
+    const uploadResult: any = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { folder: "ecommerce/avatars" },
+        (error, result) => {
+          if (error) return reject(new Error("Cloudinary upload failed"));
+          resolve(result);
+        }
+      );
+      uploadStream.end(req.file.buffer);
+    });
+    avatarUrl = uploadResult.secure_url;
   }
 
   const user = await registerService(name, email, password, avatarUrl);
