@@ -4,7 +4,8 @@ import bcrypt from "bcryptjs";
 export const registerService = async (
   name: string,
   email: string,
-  password: string
+  password: string,
+  avatar?: string
 ) => {
   const existingUser = await User.findOne({ email });
   if (existingUser) {
@@ -17,10 +18,12 @@ export const registerService = async (
     name,
     email,
     password: hashedPassword,
+    avatar,
   });
 
   return user;
 };
+
 
 export const loginService = async (
   email: string,
