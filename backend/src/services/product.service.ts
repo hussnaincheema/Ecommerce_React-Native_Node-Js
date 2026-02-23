@@ -1,59 +1,66 @@
+import { Product } from "../models/product.model";
 import { IProduct } from "../types/product.types";
 
-let products: IProduct[] = [];
-let currentId = 0;
-
-export const createProductService = (
+// Create Product
+export const createProductService = async (
   name: string,
   price: number,
   stock: number
-): IProduct => {
-  const newProduct: IProduct = {
-    id: currentId++,
-    name,
-    price,
-    stock,
+): Promise<IProduct> => {
+  const product = await Product.create({ name, price, stock });
+
+  // Map Mongoose document to IProduct
+  return {
+    _id: product._id.toString(),
+    name: product.name,
+    price: product.price,
+    stock: product.stock,
   };
-
-  products.push(newProduct);
-  return newProduct;
 };
 
-export const getAllProductsService = (): IProduct[] => {
-  return products;
+// Get all products
+export const getAllProductsService = async (): Promise<IProduct[]> => {
+  const products = await Product.find();
+
+  return products.map((p) => ({
+    _id: p._id.toString(),
+    name: p.name,
+    price: p.price,
+    stock: p.stock,
+  }));
 };
 
-export const getProductByIdService = (id: number): IProduct => {
-  const product = products.find((p) => p.id === id);
+// Get product by ID
+export const getProductByIdService = async (id: string): Promise<IProduct> => {
+  const product = await Product.findById(id);
+  if (!product) throw new Error("Product not found");
 
-  if (!product) {
-    throw new Error("Product not found");
-  }
-
-  return product;
+  return {
+    _id: product._id.toString(),
+    name: product.name,
+    price: product.price,
+    stock: product.stock,
+  };
 };
 
-export const updateProductService = (
-  id: number,
+// Update product
+export const updateProductService = async (
+  id: string,
   data: Partial<IProduct>
-): IProduct => {
-  const index = products.findIndex((p) => p.id === id);
+): Promise<IProduct> => {
+  const product = await Product.findByIdAndUpdate(id, data, { new: true });
+  if (!product) throw new Error("Product not found");
 
-  if (index === -1) {
-    throw new Error("Product not found");
-  }
-
-  products[index] = { ...products[index], ...data };
-
-  return products[index];
+  return {
+    _id: product._id.toString(),
+    name: product.name,
+    price: product.price,
+    stock: product.stock,
+  };
 };
 
-export const deleteProductService = (id: number): void => {
-  const index = products.findIndex((p) => p.id === id);
-
-  if (index === -1) {
-    throw new Error("Product not found");
-  }
-
-  products.splice(index, 1);
+// Delete product
+export const deleteProductService = async (id: string): Promise<void> => {
+  const product = await Product.findByIdAndDelete(id);
+  if (!product) throw new Error("Product not found");
 };

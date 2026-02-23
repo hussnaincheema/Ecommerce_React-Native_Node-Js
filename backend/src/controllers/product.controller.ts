@@ -15,7 +15,7 @@ export const createProduct = asyncHandler(
   async (req: Request, res: Response) => {
     const { name, price, stock } = req.body;
 
-    const product = createProductService(name, price, stock);
+    const product = await createProductService(name, price, stock);
 
     res.status(201).json({
       success: true,
@@ -30,7 +30,7 @@ export const createProduct = asyncHandler(
  */
 export const getProducts = asyncHandler(
   async (_req: Request, res: Response) => {
-    const products = getAllProductsService();
+    const products = await getAllProductsService();
 
     res.status(200).json({
       success: true,
@@ -45,9 +45,9 @@ export const getProducts = asyncHandler(
  */
 export const getProductById = asyncHandler(
   async (req: Request, res: Response) => {
-    const id = Number(req.params.id);
+    const id = req.params.id as string;
 
-    const product = getProductByIdService(id);
+    const product = await getProductByIdService(id);
 
     res.status(200).json({
       message: "Product retrieved successfully",
@@ -62,9 +62,9 @@ export const getProductById = asyncHandler(
  */
 export const updateProduct = asyncHandler(
   async (req: Request, res: Response) => {
-    const id = Number(req.params.id);
+    const id = req.params.id as string;
 
-    const product = updateProductService(id, req.body);
+    const product = await updateProductService(id, req.body);
 
     res.status(200).json({
       success: true,
@@ -79,9 +79,9 @@ export const updateProduct = asyncHandler(
  */
 export const deleteProduct = asyncHandler(
   async (req: Request, res: Response) => {
-    const id = Number(req.params.id);
+    const id = req.params.id as string;
 
-    deleteProductService(id);
+    await deleteProductService(id);
 
     res.status(200).json({
       success: true,
