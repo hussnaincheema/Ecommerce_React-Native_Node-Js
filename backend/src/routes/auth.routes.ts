@@ -7,6 +7,5 @@ const router = express.Router();
 
 router.post("/register", upload.single("avatar"), validateRegister, register);
 router.post("/login", login);
-// router.post("/product", protect, adminOnly, createProductController);
 
 export default router;
