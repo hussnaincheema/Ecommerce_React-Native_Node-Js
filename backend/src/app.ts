@@ -6,6 +6,7 @@ import cors from "cors";
 import { errorHandler } from "./middleware/error.middleware";
 import productRoutes from "./routes/product.routes";
 import cartRoutes from "./routes/cart.routes";
+import wishlistRoutes from "./routes/wishlist.routes";
 
 dotenv.config();
 connectDB();
@@ -18,6 +19,8 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/wishlist", wishlistRoutes);
+
 
 app.use(errorHandler);
 
