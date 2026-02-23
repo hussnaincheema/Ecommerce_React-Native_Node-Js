@@ -8,7 +8,8 @@ import {
 
 export const getWishlist = asyncHandler(
   async (req: Request, res: Response) => {
-    const userId = req.params.userId;
+    const rawUserId = req.params.userId;
+    const userId = Array.isArray(rawUserId) ? rawUserId[0] : rawUserId;
 
     const wishlist = await getWishlistService(userId);
 
