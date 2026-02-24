@@ -134,6 +134,13 @@
   dependencies:
     undici-types "~7.18.0"
 
+"@types/nodemailer@^7.0.11":
+  version "7.0.11"
+  resolved "https://registry.npmjs.org/@types/nodemailer/-/nodemailer-7.0.11.tgz"
+  integrity sha512-E+U4RzR2dKrx+u3N4DlsmLaDC6mMZOM/TPROxA0UAPiTgI0y4CEFBmZE+coGWTjakDriRsXG368lNk1u9Q0a2g==
+  dependencies:
+    "@types/node" "*"
+
 "@types/qs@*":
   version "6.14.0"
   resolved "https://registry.npmjs.org/@types/qs/-/qs-6.14.0.tgz"
@@ -891,6 +898,11 @@ negotiator@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/negotiator/-/negotiator-1.0.0.tgz"
   integrity sha512-8Ofs/AUQh8MaEcrlq5xOX0CQ9ypTF5dl78mjlMNfOK08fzpgTHQRQPBxcPlEtIw0yRpws+Zo/3r+5WRby7u3Gg==
+
+nodemailer@^8.0.1:
+  version "8.0.1"
+  resolved "https://registry.npmjs.org/nodemailer/-/nodemailer-8.0.1.tgz"
+  integrity sha512-5kcldIXmaEjZcHR6F28IKGSgpmZHaF1IXLWFTG+Xh3S+Cce4MiakLtWY+PlBU69fLbRa8HlaGIrC/QolUpHkhg==
 
 normalize-path@^3.0.0, normalize-path@~3.0.0:
   version "3.0.0"

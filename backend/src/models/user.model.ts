@@ -7,6 +7,11 @@ export interface IUserDocument extends Document {
   password: string;
   role: "user" | "admin";
   avatar?: string;
+  resetPasswordToken?: string;
+  resetPasswordExpire?: Date;
+  isVerified: boolean;
+  verificationToken?: string;
+  verificationTokenExpire?: Date;
   comparePassword(password: string): Promise<boolean>;
 }
 
@@ -17,6 +22,11 @@ const userSchema = new Schema<IUserDocument>(
     password: { type: String, required: true },
     avatar: { type: String },
     role: { type: String, enum: ["user", "admin"], default: "user" },
+    resetPasswordToken: { type: String },
+    resetPasswordExpire: { type: Date },
+    isVerified: { type: Boolean, default: false },
+    verificationToken: { type: String },
+    verificationTokenExpire: { type: Date },
   },
   { timestamps: true }
 );

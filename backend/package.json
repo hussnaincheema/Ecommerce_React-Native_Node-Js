@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/nodemailer": "^7.0.11",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.9.0",
     "cors": "^2.8.6",
@@ -21,7 +22,8 @@
     "express-async-handler": "^1.2.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.2.1",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "nodemailer": "^8.0.1"
   },
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",
