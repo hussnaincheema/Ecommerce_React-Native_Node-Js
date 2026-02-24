@@ -80,7 +80,8 @@ const SignupScreen = ({ navigation }: any) => {
         }
 
         try {
-            await dispatch(register(formData) as any);
+            await (dispatch(register(formData) as any));
+            navigation.navigate('VerifyEmail', { email: values.email });
         } catch (err: any) {
             Toast.show({
                 type: 'error',

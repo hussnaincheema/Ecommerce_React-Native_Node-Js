@@ -45,6 +45,7 @@ export const authReducer = (state = initialState, action: any): AuthState => {
         case AuthActionTypes.CLEAR_ERROR:
             return {
                 ...state,
+                loading: false,
                 error: null,
             };
         default:

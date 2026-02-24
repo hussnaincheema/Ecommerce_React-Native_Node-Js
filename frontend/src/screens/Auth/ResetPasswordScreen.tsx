@@ -8,27 +8,34 @@ import {
     ScrollView,
     TouchableOpacity,
     Animated,
-    Dimensions,
+    SafeAreaView
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik } from 'formik';
 import { LinearGradient } from 'expo-linear-gradient';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import Toast from 'react-native-toast-message';
+import * as Yup from 'yup';
 
-import { login } from '../../redux/actions/authActions';
+import { resetPassword } from '../../redux/actions/authActions';
 import { RootState } from '../../redux/reducers';
 import CustomInput from '../../components/Common/CustomInput';
 import CustomButton from '../../components/Common/CustomButton';
 import Colors from '../../constants/Colors';
-import { loginValidationSchema } from '../../utils/Validations';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
-const { width: screenWidth } = Dimensions.get('window');
+const resetPasswordSchema = Yup.object().shape({
+    token: Yup.string()
+        .required('Reset token is required'),
+    password: Yup.string()
+        .min(6, ({ min }) => `Password must be at least ${min} characters`)
+        .required('New password is required'),
+    confirmPassword: Yup.string()
+        .oneOf([Yup.ref('password')], 'Passwords must match')
+        .required('Please confirm your new password'),
+});
 
-const LoginScreen = ({ navigation }: any) => {
+const ResetPasswordScreen = ({ navigation }: any) => {
     const dispatch = useDispatch();
-    const { loading, error } = useSelector((state: RootState) => state.auth);
+    const { loading } = useSelector((state: RootState) => state.auth);
 
     const [fadeAnim] = useState(new Animated.Value(0));
     const [slideAnim] = useState(new Animated.Value(50));
@@ -48,31 +55,14 @@ const LoginScreen = ({ navigation }: any) => {
         ]).start();
     }, []);
 
-    const handleLogin = async (values: any) => {
+    const handleReset = async (values: any) => {
         try {
-            await (dispatch(login(values) as any));
-            // Success is handled by state change and navigation
-            // Note: In authActions, we should probably throw an error if login fails
-            // to let the catch block here show the toast, OR check state after dispatch
-        } catch (err: any) {
-            Toast.show({
-                type: 'error',
-                text1: 'Login Failed',
-                text2: err.message || 'Incorrect email or password',
-            });
+            await dispatch(resetPassword(values.token, values.password) as any);
+            navigation.navigate('Login');
+        } catch (err) {
+            // Error handled by action toast
         }
     };
-
-    // Showing error from Redux state using Toast
-    useEffect(() => {
-        if (error) {
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: error,
-            });
-        }
-    }, [error]);
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -82,6 +72,13 @@ const LoginScreen = ({ navigation }: any) => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
             >
+                <TouchableOpacity
+                    style={styles.backButton}
+                    onPress={() => navigation.goBack()}
+                >
+                    <MaterialCommunityIcons name="arrow-left" size={28} color={Colors.darkGreen} />
+                </TouchableOpacity>
+
                 <KeyboardAvoidingView
                     behavior={Platform.OS === 'ios' ? 'padding' : undefined}
                     style={styles.keyboardView}
@@ -102,16 +99,16 @@ const LoginScreen = ({ navigation }: any) => {
                         >
                             <View style={styles.headerSection}>
                                 <View style={styles.logoCircle}>
-                                    <MaterialCommunityIcons name="shopping" size={50} color={Colors.primary} />
+                                    <MaterialCommunityIcons name="key-variant" size={50} color={Colors.primary} />
                                 </View>
-                                <Text style={styles.title}>Welcome Back</Text>
-                                <Text style={styles.subtitle}>Professional shopping made simple</Text>
+                                <Text style={styles.title}>Reset Password</Text>
+                                <Text style={styles.subtitle}>Enter the token from your email and your new password</Text>
                             </View>
 
                             <Formik
-                                initialValues={{ email: '', password: '', securePassword: true }}
-                                validationSchema={loginValidationSchema}
-                                onSubmit={handleLogin}
+                                initialValues={{ token: '', password: '', confirmPassword: '', securePassword: true }}
+                                validationSchema={resetPasswordSchema}
+                                onSubmit={handleReset}
                             >
                                 {({
                                     handleChange,
@@ -123,25 +120,21 @@ const LoginScreen = ({ navigation }: any) => {
                                     setFieldValue
                                 }) => (
                                     <View style={styles.card}>
-                                        <Text style={styles.cardTitle}>Sign In</Text>
-                                        <Text style={styles.cardSubtitle}>Enter your credentials to access your account</Text>
-
                                         <View style={styles.inputGroup}>
                                             <CustomInput
-                                                label="Email Address"
-                                                placeholder="Enter your email"
-                                                value={values.email}
-                                                onChangeText={handleChange('email')}
-                                                onBlur={handleBlur('email')}
+                                                label="Reset Token"
+                                                placeholder="Enter token from email"
+                                                value={values.token}
+                                                onChangeText={handleChange('token')}
+                                                onBlur={handleBlur('token')}
                                                 autoCapitalize="none"
-                                                keyboardType="email-address"
                                                 leftComponent={
-                                                    <MaterialCommunityIcons name="email-outline" size={20} color={Colors.mediumGray} />
+                                                    <MaterialCommunityIcons name="ticket-outline" size={20} color={Colors.mediumGray} />
                                                 }
                                             />
                                             <View style={styles.errorContainer}>
-                                                {touched.email && errors.email ? (
-                                                    <Text style={styles.errorText}>{errors.email}</Text>
+                                                {touched.token && errors.token ? (
+                                                    <Text style={styles.errorText}>{errors.token}</Text>
                                                 ) : (
                                                     <Text style={styles.errorPlaceholder}>.</Text>
                                                 )}
@@ -150,8 +143,8 @@ const LoginScreen = ({ navigation }: any) => {
 
                                         <View style={styles.inputGroup}>
                                             <CustomInput
-                                                label="Password"
-                                                placeholder="Enter your password"
+                                                label="New Password"
+                                                placeholder="Enter new password"
                                                 value={values.password}
                                                 onChangeText={handleChange('password')}
                                                 onBlur={handleBlur('password')}
@@ -178,36 +171,35 @@ const LoginScreen = ({ navigation }: any) => {
                                             </View>
                                         </View>
 
-                                        <TouchableOpacity
-                                            style={styles.forgotPassword}
-                                            onPress={() => navigation.navigate('ForgotPassword')}
-                                        >
-                                            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-                                        </TouchableOpacity>
+                                        <View style={styles.inputGroup}>
+                                            <CustomInput
+                                                label="Confirm Password"
+                                                placeholder="Confirm new password"
+                                                value={values.confirmPassword}
+                                                onChangeText={handleChange('confirmPassword')}
+                                                onBlur={handleBlur('confirmPassword')}
+                                                secureTextEntry={values.securePassword}
+                                                leftComponent={
+                                                    <MaterialCommunityIcons name="lock-check-outline" size={20} color={Colors.mediumGray} />
+                                                }
+                                            />
+                                            <View style={styles.errorContainer}>
+                                                {touched.confirmPassword && errors.confirmPassword ? (
+                                                    <Text style={styles.errorText}>{errors.confirmPassword}</Text>
+                                                ) : (
+                                                    <Text style={styles.errorPlaceholder}>.</Text>
+                                                )}
+                                            </View>
+                                        </View>
 
                                         <CustomButton
-                                            title="Sign In"
+                                            title="Reset Password"
                                             onPress={handleSubmit as any}
                                             loading={loading}
                                         />
                                     </View>
                                 )}
                             </Formik>
-
-                            <View style={styles.footer}>
-                                <View style={styles.dividerContainer}>
-                                    <View style={styles.dividerLine} />
-                                    <Text style={styles.dividerText}>or</Text>
-                                    <View style={styles.dividerLine} />
-                                </View>
-
-                                <View style={styles.signUpContainer}>
-                                    <Text style={styles.footerText}>Don't have an account? </Text>
-                                    <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-                                        <Text style={styles.linkText}>Sign Up</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
                         </Animated.View>
                     </ScrollView>
                 </KeyboardAvoidingView>
@@ -224,6 +216,13 @@ const styles = StyleSheet.create({
     backgroundGradient: {
         flex: 1,
     },
+    backButton: {
+        position: 'absolute',
+        top: 50,
+        left: 20,
+        zIndex: 10,
+        padding: 8,
+    },
     keyboardView: {
         flex: 1,
     },
@@ -231,13 +230,13 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         paddingHorizontal: 20,
         paddingBottom: 40,
+        justifyContent: 'center',
     },
     formContainer: {
-        flex: 1,
+        width: '100%',
     },
     headerSection: {
         alignItems: 'center',
-        marginTop: 40,
         marginBottom: 30,
     },
     logoCircle: {
@@ -264,6 +263,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: Colors.grey,
         textAlign: 'center',
+        paddingHorizontal: 20,
     },
     card: {
         backgroundColor: Colors.white,
@@ -275,21 +275,8 @@ const styles = StyleSheet.create({
         shadowRadius: 16,
         elevation: 8,
     },
-    cardTitle: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        color: Colors.darkGreen,
-        marginBottom: 8,
-        textAlign: 'center',
-    },
-    cardSubtitle: {
-        fontSize: 13,
-        color: Colors.grey,
-        textAlign: 'center',
-        marginBottom: 24,
-    },
     inputGroup: {
-        marginBottom: 5,
+        marginBottom: 10,
     },
     errorContainer: {
         minHeight: 20,
@@ -305,46 +292,6 @@ const styles = StyleSheet.create({
         opacity: 0,
         fontSize: 12,
     },
-    forgotPassword: {
-        alignSelf: 'flex-end',
-        marginBottom: 24,
-    },
-    forgotPasswordText: {
-        color: Colors.darkGreen,
-        fontSize: 14,
-        fontWeight: '600',
-    },
-    footer: {
-        marginTop: 30,
-    },
-    dividerContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 24,
-    },
-    dividerLine: {
-        flex: 1,
-        height: 1,
-        backgroundColor: Colors.lightGray,
-    },
-    dividerText: {
-        fontSize: 14,
-        color: Colors.mediumGray,
-        marginHorizontal: 16,
-    },
-    signUpContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-    },
-    footerText: {
-        color: Colors.grey,
-        fontSize: 15,
-    },
-    linkText: {
-        color: Colors.darkGreen,
-        fontSize: 15,
-        fontWeight: 'bold',
-    },
 });
 
-export default LoginScreen;
+export default ResetPasswordScreen;
