@@ -53,7 +53,7 @@ const ForgotPasswordScreen = ({ navigation }: any) => {
     const handleForgot = async (values: { email: string }) => {
         try {
             await dispatch(forgotPassword(values.email) as any);
-            // navigation.navigate('ResetPassword'); // We can navigate if we want them to enter token immediately
+            navigation.navigate('ResetPassword');
         } catch (err) {
             // Error handled by action toast
         }
