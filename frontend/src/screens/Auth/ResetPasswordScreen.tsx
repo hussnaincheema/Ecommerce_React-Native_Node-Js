@@ -57,7 +57,7 @@ const ResetPasswordScreen = ({ navigation }: any) => {
 
     const handleReset = async (values: any) => {
         try {
-            await dispatch(resetPassword(values.token, values.password) as any);
+            await dispatch(resetPassword(values.token.trim(), values.password) as any);
             navigation.navigate('Login');
         } catch (err) {
             // Error handled by action toast
@@ -106,7 +106,7 @@ const ResetPasswordScreen = ({ navigation }: any) => {
                             </View>
 
                             <Formik
-                                initialValues={{ token: '', password: '', confirmPassword: '', securePassword: true }}
+                                initialValues={{ token: '', password: '', confirmPassword: '', securePassword: true, secureConfirmPassword: true }}
                                 validationSchema={resetPasswordSchema}
                                 onSubmit={handleReset}
                             >
@@ -178,9 +178,18 @@ const ResetPasswordScreen = ({ navigation }: any) => {
                                                 value={values.confirmPassword}
                                                 onChangeText={handleChange('confirmPassword')}
                                                 onBlur={handleBlur('confirmPassword')}
-                                                secureTextEntry={values.securePassword}
+                                                secureTextEntry={values.secureConfirmPassword}
                                                 leftComponent={
                                                     <MaterialCommunityIcons name="lock-check-outline" size={20} color={Colors.mediumGray} />
+                                                }
+                                                rightIcon={
+                                                    <TouchableOpacity onPress={() => setFieldValue('secureConfirmPassword', !values.secureConfirmPassword)}>
+                                                        <MaterialCommunityIcons
+                                                            name={values.secureConfirmPassword ? "eye-outline" : "eye-off-outline"}
+                                                            size={20}
+                                                            color={Colors.mediumGray}
+                                                        />
+                                                    </TouchableOpacity>
                                                 }
                                             />
                                             <View style={styles.errorContainer}>
